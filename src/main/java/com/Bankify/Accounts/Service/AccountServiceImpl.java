@@ -40,6 +40,8 @@ public class AccountServiceImpl implements IAccountService {
         }
         customer.setCreatedAt(LocalDate.now());
         customer.setCreatedBy(customerDTO.getName());
+        System.out.println(customer.toString());
+
 
         customerRepository.save(customer);
 

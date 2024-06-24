@@ -5,6 +5,7 @@ import com.Bankify.Accounts.DTO.AccountDTO;
 import com.Bankify.Accounts.DTO.CustomerDTO;
 import com.Bankify.Accounts.Entity.Account;
 import com.Bankify.Accounts.Entity.Customer;
+import com.Bankify.Accounts.Exception.AccountNotFoundException;
 import com.Bankify.Accounts.Exception.CustomerAlreadyExistException;
 import com.Bankify.Accounts.IAccountService;
 import com.Bankify.Accounts.Mapper.AccountMapper;
@@ -49,6 +50,16 @@ public class AccountServiceImpl implements IAccountService {
 
 
     }
+
+    @Override
+    public AccountDTO getAccount(long accountNumber) {
+        Optional<Account> accountOptional =accountRepository.findByAccountNumber(accountNumber);
+        if(accountOptional.isEmpty()){
+            throw new AccountNotFoundException("Account Not Found with given Account Number :"+accountNumber);
+        }
+        return  AccountMapper.mapToAccountDTO(accountOptional.get(),new AccountDTO());
+    }
+
 
     private Account generateAccount(Customer customer) {
         long accountNumber = 1000000000L + new Random().nextInt(90000000);

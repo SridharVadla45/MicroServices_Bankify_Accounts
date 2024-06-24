@@ -21,6 +21,6 @@ public class MetaDataEntity {
     @Column(insertable = false , updatable = true)
     private LocalDate updatedAt;
     @Column(insertable = false, updatable = true)
-    private LocalDate updatedBy;
+    private String updatedBy;
 
 }

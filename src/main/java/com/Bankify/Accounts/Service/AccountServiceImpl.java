@@ -7,14 +7,13 @@ import com.Bankify.Accounts.Entity.Account;
 import com.Bankify.Accounts.Entity.Customer;
 import com.Bankify.Accounts.Exception.AccountNotFoundException;
 import com.Bankify.Accounts.Exception.CustomerAlreadyExistException;
+import com.Bankify.Accounts.Exception.ResourceNotFoundException;
 import com.Bankify.Accounts.IAccountService;
 import com.Bankify.Accounts.Mapper.AccountMapper;
 import com.Bankify.Accounts.Mapper.CustomerMapper;
 import com.Bankify.Accounts.Repository.AccountRepository;
 import com.Bankify.Accounts.Repository.CustomerRepository;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,7 +24,6 @@ import java.util.Random;
 @Service
 @AllArgsConstructor
 public class AccountServiceImpl implements IAccountService {
-
 
 
     private AccountRepository accountRepository;
@@ -41,7 +39,7 @@ public class AccountServiceImpl implements IAccountService {
         }
         customer.setCreatedAt(LocalDate.now());
         customer.setCreatedBy(customerDTO.getName());
-        System.out.println(customer.toString());
+
 
 
         customerRepository.save(customer);
@@ -53,11 +51,42 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public AccountDTO getAccount(long accountNumber) {
-        Optional<Account> accountOptional =accountRepository.findByAccountNumber(accountNumber);
-        if(accountOptional.isEmpty()){
-            throw new AccountNotFoundException("Account Not Found with given Account Number :"+accountNumber);
+        Optional<Account> accountOptional = accountRepository.findByAccountNumber(accountNumber);
+        if (accountOptional.isEmpty()) {
+            throw new AccountNotFoundException("Account Not Found with given Account Number :" + accountNumber);
         }
-        return  AccountMapper.mapToAccountDTO(accountOptional.get(),new AccountDTO());
+        return AccountMapper.mapToAccountDTO(accountOptional.get(), new AccountDTO());
+    }
+
+    @Override
+    public CustomerDTO getCustomerDTO(String emailId) {
+        Customer customer = customerRepository.findByEmail(emailId).orElseThrow(() -> new ResourceNotFoundException("Customer", "emailId", emailId));
+        Account account = accountRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(() -> new ResourceNotFoundException("Account", "CustomerId", customer.getCustomerId().toString()));
+        CustomerDTO customerDTO = CustomerMapper.mapToCustomerDTO(customer, new CustomerDTO());
+        customerDTO.setAccountDTO(AccountMapper.mapToAccountDTO(account, new AccountDTO()));
+        return customerDTO;
+    }
+
+    @Override
+    public void updateAccount(String emailId, CustomerDTO customerDTO) {
+        Customer customer = customerRepository.findByEmail(emailId).orElseThrow(() -> new ResourceNotFoundException("Customer", "emailId", emailId));
+        Account account = accountRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(() -> new ResourceNotFoundException("Account", "CustomerId", customer.getCustomerId().toString()));
+        customer.setName(customerDTO.getName());
+        customer.setMobileNumber(customerDTO.getMobileNumber());
+        customer.setUpdatedAt(LocalDate.now());
+        customer.setUpdatedBy(customerDTO.getName());
+        account.setUpdatedAt(LocalDate.now());
+        account.setUpdatedBy(customerDTO.getName());
+        customerRepository.save(customer);
+        accountRepository.save(account);
+    }
+
+    @Override
+    public void deleteAccount(String emailId) {
+        Customer customer = customerRepository.findByEmail(emailId).orElseThrow(() -> new ResourceNotFoundException("Customer", "emailId", emailId));
+        customerRepository.deleteById(customer.getCustomerId());
+        Account account = accountRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(() -> new ResourceNotFoundException("Account", "CustomerId", customer.getCustomerId().toString()));
+        accountRepository.deleteById(account.getAccountNumber());
     }
 
 

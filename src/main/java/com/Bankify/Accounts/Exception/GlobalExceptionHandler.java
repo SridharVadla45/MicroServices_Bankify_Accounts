@@ -39,4 +39,17 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(value = {ResourceNotFoundException.class})
+    public ResponseEntity<ErrorResponseDTO> handleAccountNotFoundException(ResourceNotFoundException resourceNotFoundException, WebRequest webRequest) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponseDTO(
+                                webRequest.getDescription(false).replace("uri=", ""),
+                                HttpStatus.NOT_FOUND,
+                                LocalDate.now(),
+                                resourceNotFoundException.getMessage()
+                        )
+                );
+    }
+
 }

@@ -8,4 +8,10 @@ public interface IAccountService {
     void createAccount(CustomerDTO customerDTO);
 
     AccountDTO getAccount(long accountNumber);
+
+    CustomerDTO getCustomerDTO(String emailId);
+
+    void updateAccount(String emailId,CustomerDTO customerDTO);
+
+    void deleteAccount(String emailId);
 }

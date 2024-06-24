@@ -39,4 +39,32 @@ public class AccountController {
                 .status(HttpStatus.OK)
                 .body(accountDTO);
     }
+
+    @GetMapping("/getCustomer/{emailId}")
+    public ResponseEntity<CustomerDTO> fetchCustomerDetails(@PathVariable String emailId) {
+
+        CustomerDTO customerDTO = iAccountService.getCustomerDTO(emailId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(customerDTO);
+
+    }
+
+    //update
+    @PutMapping("/update/{emailId}")
+    public ResponseEntity<ResponseDTO> updateCustomerDetails(@PathVariable String emailId, @RequestBody CustomerDTO customerDTO) {
+
+        iAccountService.updateAccount(emailId, customerDTO);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO("Account details updated successfully ",HttpStatus.OK));
+    }
+
+    @DeleteMapping("/delete/{emailId}")
+    public ResponseEntity<ResponseDTO> deleteAccountDetails(@PathVariable String emailId){
+       iAccountService.deleteAccount(emailId);
+       return  ResponseEntity
+               .status(HttpStatus.OK)
+               .body(new ResponseDTO("Account deleted Successfully ",HttpStatus.OK));
+    }
 }

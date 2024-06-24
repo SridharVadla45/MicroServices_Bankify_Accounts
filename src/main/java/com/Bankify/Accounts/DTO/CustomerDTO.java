@@ -17,5 +17,7 @@ public class CustomerDTO {
 
     private String mobileNumber;
 
+    private AccountDTO accountDTO;
+
 
 }

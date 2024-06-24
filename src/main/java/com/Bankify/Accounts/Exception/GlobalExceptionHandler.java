@@ -52,4 +52,17 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(value = {Exception.class})
+    public ResponseEntity<ErrorResponseDTO> handleAccountNotFoundException(Exception exception, WebRequest webRequest) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponseDTO(
+                                webRequest.getDescription(false).replace("uri=", ""),
+                                HttpStatus.NOT_FOUND,
+                                LocalDate.now(),
+                                exception.getMessage()
+                        )
+                );
+    }
+
 }
